@@ -2,6 +2,7 @@ import csv
 import cv2
 import os
 import pickle
+import matplotlib.pyplot as plt
 import numpy as np
 import sklearn
 import tensorflow as tf
@@ -158,5 +159,14 @@ if __name__ == '__main__':
     print("n_train: {}".format(n_train))
     print("n_valid: {}".format(n_valid))
 
-    model.fit_generator(train_generator, samples_per_epoch=n_train,
+    history_object = model.fit_generator(train_generator, samples_per_epoch=n_train,
             validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=3)
+
+    plt.plot(history_object.history['loss'])
+    plt.plot(history_object.history['val_loss'])
+    plt.title('model mean squared error loss')
+    plt.ylabel('mean squared error loss')
+    plt.xlabel('epoch')
+    plt.legend(['training set', 'validation set'], loc='upper right')
+    plt.savefig('results/loss_{}.png'.format(model.name))
+
