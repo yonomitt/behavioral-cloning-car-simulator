@@ -32,7 +32,7 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
     model.add(Cropping2D(cropping=((55, 25), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
 
     # mean center the pixels
-    model.add(Lambda(lambda x: (x / 255.0) - 0.5), 'pp_center')
+    model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
     # layer 1: convolution. Input 40
     model.add(Convolution2D(8, 5, 5, border_mode='same', name='conv1'))
