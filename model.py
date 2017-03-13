@@ -28,8 +28,8 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
 
     model = Sequential()
 
-    # crop top 55 rows and bottom 25 rows from the images
-    model.add(Cropping2D(cropping=((55, 25), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 28 rows and bottom 12 rows from the images
+    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
