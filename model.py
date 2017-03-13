@@ -5,8 +5,8 @@ import tensorflow as tf
 tf.python.control_flow_ops = tf
 
 from keras.models import Sequential
-from keras.layers.core import Dense, Activation, Flatten, Dropout
-from keras.layers.convolutional import Convolution2D
+from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
+from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
 from keras.utils.visualize_util import plot
 
