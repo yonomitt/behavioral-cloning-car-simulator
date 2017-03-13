@@ -1,5 +1,9 @@
+import csv
+import cv2
+import os
 import pickle
 import numpy as np
+import sklearn
 import tensorflow as tf
 
 tf.python.control_flow_ops = tf
@@ -9,6 +13,10 @@ from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
 from keras.utils.visualize_util import plot
+
+
+STEERING_CORRECTION = 0.2
+VALIDATION_PCT = 0.2
 
 
 def conv_3_fc_3(dropout = [0.5, 0.5]):
@@ -55,10 +63,98 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
 
     return model
 
+
+def data_generator(samples, batch_size=128):
+
+    """A generator method to provide the model with data during training"""
+
+    num_samples = len(samples)
+    while 1: # Loop forever so the generator never terminates
+        np.random.shuffle(samples)
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+
+            images = []
+            angles = []
+            for batch_sample in batch_samples:
+                name = batch_sample[0]
+                image = cv2.imread(name)
+                image = cv2.resize(image, (160, 80))
+                angle = batch_sample[1]
+                images.append(image)
+                angles.append(angle)
+
+            # trim image to only see section with road
+            X_train = np.array(images)
+            y_train = np.array(angles)
+            yield sklearn.utils.shuffle(X_train, y_train)
+
+
+def gen_rel_img(base, path):
+
+    """Helper function to return the image relative to the base directory
+
+    Parameters:
+        - path: path to the image
+
+    Returns: string with the image file name realtive to the base directory"""
+
+    if path.lower().startswith("c:"):
+        path = path.split('\\')[-1]
+
+    return os.path.join(base, "IMG", os.path.split(path.strip())[-1])
+
+
+def read_samples(base_dirs):
+
+    """Read the samples from CSV files
+
+    Parameters:
+        - base_dirs: list of directories containing the CSV files
+        
+    Returns: list of tuples containing the absolute path to the image and the normalized steering angle"""
+
+    samples = []
+
+    for base_dir in base_dirs:
+
+        with open(os.path.join(base_dir, "driving_log.csv")) as f:
+            log = [l.split(',') for l in f.read().split('\n')[1:-1]]
+
+            # center image
+            samples.extend([(gen_rel_img(base_dir, l[0]), float(l[3]) / 25.0) for l in log])
+            # left image
+            samples.extend([(gen_rel_img(base_dir, l[1]), (float(l[3]) + STEERING_CORRECTION) / 25.0) for l in log])
+            # right image
+            samples.extend([(gen_rel_img(base_dir, l[2]), (float(l[3]) - STEERING_CORRECTION) / 25.0) for l in log])
+
+    return samples
+
+
 if __name__ == '__main__':
 
     model = conv_3_fc_3(dropout=[0.2, 0.5])
     model.summary()
     plot(model, show_shapes=True, to_file='model.png')
 
+    # get data
+    samples = read_samples(['data/udacity', 'data/u0'])
+
+    n_samples = len(samples)
+    n_valid = round(n_samples * VALIDATION_PCT)
+    n_train = n_samples - n_valid
+
+    train_samples = samples[:n_train]
+    valid_samples = samples[n_train:]
+
+    train_generator = data_generator(train_samples, batch_size=32)
+    valid_generator = data_generator(valid_samples, batch_size=32)
+
     model.compile(loss='mse', optimizer='adam')
+
+    print("n_samples: {}".format(n_samples))
+    print("n_train: {}".format(n_train))
+    print("n_valid: {}".format(n_valid))
+
+    model.fit_generator(train_generator, samples_per_epoch=n_train,
+            validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=3)
