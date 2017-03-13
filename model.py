@@ -5,6 +5,7 @@ import pickle
 import numpy as np
 import sklearn
 import tensorflow as tf
+import traceback
 
 tf.python.control_flow_ops = tf
 
@@ -34,7 +35,8 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
         'full5': { 'outputs': 24 },
     }
 
-    model = Sequential()
+    # this hack gets the current function name and sets it to the name of the model
+    model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
     # crop top 28 rows and bottom 12 rows from the images
     model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
