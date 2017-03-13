@@ -137,10 +137,10 @@ if __name__ == '__main__':
 
     model = conv_3_fc_3(dropout=[0.2, 0.5])
     model.summary()
-    plot(model, show_shapes=True, to_file='model.png')
+    plot(model, show_shapes=True, to_file='results/model_{}.png'.format(model.name))
 
     # get data
-    samples = read_samples(['data/udacity', 'data/u0'])
+    samples = read_samples(['data/udacity'])
 
     n_samples = len(samples)
     n_valid = round(n_samples * VALIDATION_PCT)
