@@ -107,32 +107,33 @@ def end_to_end_nvidia(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution. Input 40x160x3. Output 38x158x24
+    # layer 1: convolution. Input 40x160x3. Output 36x156x24
     model.add(Convolution2D(24, 5, 5, border_mode='valid', name='conv1'))
     model.add(Activation('relu', name='act1'))
 
-    # layer 2: convolution + max pooling. Input 38x158x24. Output 16x76x36
+    # layer 2: convolution + max pooling. Input 36x156x24. Output 16x76x36
     model.add(Convolution2D(36, 5, 5, border_mode='valid', name='conv2'))
     model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool2'))
     model.add(Activation('relu', name='act2'))
 
-    # layer 3: convolution + max pooling. Input 16x76x36. Output 5x35x48
+    # layer 3: convolution + max pooling. Input 16x76x36. Output 6x36x48
     model.add(Convolution2D(48, 5, 5, border_mode='valid', name='conv3'))
     model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool3'))
     model.add(Activation('relu', name='act3'))
 
-    # layer 4: convolution. Input 5x35x48. Output 3x33x64
+    # layer 4: convolution. Input 6x36x48. Output 4x34x64
     model.add(Convolution2D(64, 3, 3, border_mode='valid', name='conv4'))
     model.add(Activation('relu', name='act4'))
 
-    # layer 5: convolution. Input 3x33x64. Output 1x31x64
+    # layer 5: convolution. Input 4x34x64. Output 1x16x64
     model.add(Convolution2D(64, 3, 3, border_mode='valid', name='conv5'))
+    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool5'))
     model.add(Activation('relu', name='act5'))
 
-    # flatten: Input 1x31x64. Output 1984
+    # flatten: Input 1x16x64. Output 1024 
     model.add(Flatten(name='flat'))
 
-    # layer 6: fully connected + dropout. Input 1984. Output 100
+    # layer 6: fully connected + dropout. Input 1024. Output 100
     model.add(Dense(100, name='fc6'))
     model.add(Dropout(dropout[0], name='drop6'))
     model.add(Activation('relu', name='act6'))
