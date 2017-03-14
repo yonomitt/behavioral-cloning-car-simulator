@@ -80,6 +80,79 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
     return model
 
 
+def end_to_end_nvidia(dropout = []):
+
+    """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
+    Cars:
+
+    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
+
+    params = {
+        'conv1': { 'filters': 24, 'size': 5 },
+        'conv2': { 'filters': 36, 'size': 5 },
+        'conv3': { 'filters': 48, 'size': 5 },
+        'conv4': { 'filters': 64, 'size': 3 },
+        'conv5': { 'filters': 64, 'size': 3 },
+        'full6': { 'outputs': 100 },
+        'full7': { 'outputs': 50 },
+        'full8': { 'outputs': 10 },
+    }
+
+    # this hack gets the current function name and sets it to the name of the model
+    model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
+
+    # crop top 28 rows and bottom 12 rows from the images
+    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+
+    # mean center the pixels
+    model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
+
+    # layer 1: convolution. Input 40x160x3. Output 38x158x24
+    model.add(Convolution2D(24, 5, 5, border_mode='valid', name='conv1'))
+    model.add(Activation('relu', name='act1'))
+
+    # layer 2: convolution + max pooling. Input 38x158x24. Output 16x76x36
+    model.add(Convolution2D(36, 5, 5, border_mode='valid', name='conv2'))
+    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool2'))
+    model.add(Activation('relu', name='act2'))
+
+    # layer 3: convolution + max pooling. Input 16x76x36. Output 5x35x48
+    model.add(Convolution2D(48, 5, 5, border_mode='valid', name='conv3'))
+    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool3'))
+    model.add(Activation('relu', name='act3'))
+
+    # layer 4: convolution. Input 5x35x48. Output 3x33x64
+    model.add(Convolution2D(64, 3, 3, border_mode='valid', name='conv4'))
+    model.add(Activation('relu', name='act4'))
+
+    # layer 5: convolution. Input 3x33x64. Output 1x31x64
+    model.add(Convolution2D(64, 3, 3, border_mode='valid', name='conv5'))
+    model.add(Activation('relu', name='act5'))
+
+    # flatten: Input 1x31x64. Output 1984
+    model.add(Flatten(name='flat'))
+
+    # layer 6: fully connected + dropout. Input 1984. Output 100
+    model.add(Dense(100, name='fc6'))
+    model.add(Dropout(dropout[0], name='drop6'))
+    model.add(Activation('relu', name='act6'))
+
+    # layer 7: fully connected + dropout. Input 100. Output 50
+    model.add(Dense(50, name='fc7'))
+    model.add(Dropout(dropout[1], name='drop7'))
+    model.add(Activation('relu', name='act7'))
+
+    # layer 8: fully connected + dropout. Input 50. Output 10
+    model.add(Dense(10, name='fc8'))
+    model.add(Dropout(dropout[2], name='drop8'))
+    model.add(Activation('relu', name='act8'))
+
+    # layer 9: fully connected. Input 10. Output 1.
+    model.add(Dense(1, name='out'))
+
+    return model
+
+    
 def data_generator(samples, batch_size=128):
 
     """A generator method to provide the model with data during training"""
