@@ -11,6 +11,7 @@ import traceback
 tf.python.control_flow_ops = tf
 
 from keras.models import Sequential
+from keras.callbacks import ModelCheckpoint
 from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
@@ -165,8 +166,11 @@ if __name__ == '__main__':
     print("n_train: {}".format(n_train))
     print("n_valid: {}".format(n_valid))
 
+    save_best = ModelCheckpoint("{}.hdf5".format(exp_name), save_best_only=True, verbose=1)
+
     history_object = model.fit_generator(train_generator, samples_per_epoch=n_train,
-            validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch)
+            validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch,
+            callbacks=[save_best])
 
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
