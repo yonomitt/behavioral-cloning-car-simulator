@@ -136,9 +136,15 @@ def read_samples(base_dirs):
 
 if __name__ == '__main__':
 
+    batch_size = 32
+    nb_epoch = 5
+
     model = conv_3_fc_3(dropout=[0.2, 0.5])
     model.summary()
-    plot(model, show_shapes=True, to_file='results/model_{}.png'.format(model.name))
+
+    exp_name = "{}.b{}.e{}".format(model.name, batch_size, nb_epoch)
+
+    plot(model, show_shapes=True, to_file='results/model_{}.png'.format(exp_name))
 
     # get data
     samples = read_samples(['data/udacity'])
@@ -150,8 +156,8 @@ if __name__ == '__main__':
     train_samples = samples[:n_train]
     valid_samples = samples[n_train:]
 
-    train_generator = data_generator(train_samples, batch_size=32)
-    valid_generator = data_generator(valid_samples, batch_size=32)
+    train_generator = data_generator(train_samples, batch_size=batch_size)
+    valid_generator = data_generator(valid_samples, batch_size=batch_size)
 
     model.compile(loss='mse', optimizer='adam')
 
@@ -160,7 +166,7 @@ if __name__ == '__main__':
     print("n_valid: {}".format(n_valid))
 
     history_object = model.fit_generator(train_generator, samples_per_epoch=n_train,
-            validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=3)
+            validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch)
 
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
@@ -168,5 +174,5 @@ if __name__ == '__main__':
     plt.ylabel('mean squared error loss')
     plt.xlabel('epoch')
     plt.legend(['training set', 'validation set'], loc='upper right')
-    plt.savefig('results/loss_{}.png'.format(model.name))
+    plt.savefig('results/loss_{}.png'.format(exp_name))
 
