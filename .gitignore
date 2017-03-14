@@ -1,0 +1,5 @@
+data
+results
+*.swp
+*.pyc
+__pycache__
