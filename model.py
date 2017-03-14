@@ -46,23 +46,35 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution. Input 40
+    # layer 1: convolution + max pooling. Input 40x160x3. Output 20x80x8
     model.add(Convolution2D(8, 5, 5, border_mode='same', name='conv1'))
     model.add(MaxPooling2D((2, 2), name='pool1'))
     model.add(Activation('relu', name='act1'))
+
+    # layer 2: convolution = max pooling. Input 20x80x8. Output 10x40x16
     model.add(Convolution2D(16, 3, 3, border_mode='same', name='conv2'))
     model.add(MaxPooling2D((2, 2), name='pool2'))
     model.add(Activation('relu', name='act2'))
+
+    # layer 3: convolution = max pooling. Input 10x40x16. Output 5x20x32
     model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv3'))
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
+
+    # flatten: Input 5x20x32. Output 3200
     model.add(Flatten(name='flat'))
+
+    # layer 4: fully connected + dropout. Input 3200. Output 556
     model.add(Dense(556, name='fc4'))
     model.add(Dropout(dropout[0], name='drop4'))
     model.add(Activation('relu', name='act4'))
+
+    # layer 5: fully connected + dropout. Input 556. Output 24
     model.add(Dense(24, name='fc5'))
     model.add(Dropout(dropout[1], name='drop5'))
     model.add(Activation('relu', name='act5'))
+
+    # layer 6: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
