@@ -16,12 +16,18 @@ import traceback
 
 tf.python.control_flow_ops = tf
 
+import keras
+
 from keras.models import Sequential
 from keras.callbacks import ModelCheckpoint
 from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
-from keras.utils.visualize_util import plot
+
+if keras.__version__.startswith('1'):
+    from keras.utils.visualize_util import plot
+else:
+    from keras.utils.vis_utils import plot_model as plot
 
 
 STEERING_CORRECTION = 0.2
