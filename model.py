@@ -1,3 +1,9 @@
+from sys import platform
+
+if platform == 'linux':
+    import matplotlib
+    matplotlib.use('Agg')
+
 import csv
 import cv2
 import os
