@@ -1,5 +1,6 @@
 data
 results
+run*
 *.swp
 *.pyc
 __pycache__
