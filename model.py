@@ -34,7 +34,7 @@ STEERING_CORRECTION = 0.2
 VALIDATION_PCT = 0.2
 
 
-def conv_3_fc_3(dropout = [0.5, 0.5]):
+def conv_3_fc_3(dropout = []):
 
     """This network has three convolution layers and three fully connected layers
 
@@ -48,6 +48,11 @@ def conv_3_fc_3(dropout = [0.5, 0.5]):
         'full4': { 'outputs': 556 },
         'full5': { 'outputs': 24 },
     }
+
+    if dropout == None or len(dropout) == 0:
+        dropout = [0.0, 0.0]
+    elif len(dropout) == 1:
+        dropout = dropout * 2
 
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
@@ -109,6 +114,13 @@ def end_to_end_nvidia(dropout = []):
         'full7': { 'outputs': 50 },
         'full8': { 'outputs': 10 },
     }
+
+    if dropout == None or len(dropout) == 0:
+        dropout = [0.0, 0.0, 0.0]
+    elif len(dropout) == 1:
+        dropout = dropout * 3
+    elif len(dropout) == 2:
+        dropout.append(dropout[1])
 
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
