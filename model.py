@@ -59,8 +59,11 @@ def conv_3_fc_3_more_filters(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
+
+    # resize the image
+    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
@@ -122,8 +125,11 @@ def conv_3_fc_3(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
+
+    # resize the image
+    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
@@ -248,8 +254,11 @@ def end_to_end_nvidia(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
+
+    # resize the image
+    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
