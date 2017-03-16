@@ -241,7 +241,7 @@ def end_to_end_nvidia(dropout = []):
     return model
 
     
-def data_generator(samples, batch_size=128):
+def data_generator(samples, resize=None, batch_size=128):
 
     """A generator method to provide the model with data during training"""
 
@@ -256,7 +256,8 @@ def data_generator(samples, batch_size=128):
             for batch_sample in batch_samples:
                 name = batch_sample[0]
                 image = cv2.imread(name)
-                image = cv2.resize(image, (160, 80))
+                if resize:
+                    image = cv2.resize(image, resize)
                 angle = batch_sample[1]
                 images.append(image)
                 angles.append(angle)
