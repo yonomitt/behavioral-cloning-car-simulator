@@ -64,7 +64,10 @@ def conv_3_fc_3_more_filters(dropout = []):
     model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # resize the image
-    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    try:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    except:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, 40, 160)))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
@@ -130,7 +133,10 @@ def conv_3_fc_3(dropout = []):
     model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # resize the image
-    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    try:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    except:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, 40, 160)))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
@@ -200,7 +206,10 @@ def resnet_ish(dropout = []):
     model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # resize the image for ResNet50
-    model.add(Lambda(lambda img: tf.image.resize_images(img, (224, 224))))
+    try:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, (224, 224))))
+    except:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, 224, 224)))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
@@ -259,7 +268,10 @@ def end_to_end_nvidia(dropout = []):
     model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # resize the image
-    model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    try:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, (40, 160))))
+    except:
+        model.add(Lambda(lambda img: tf.image.resize_images(img, 40, 160)))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
