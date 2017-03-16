@@ -23,6 +23,8 @@ from keras.callbacks import ModelCheckpoint
 from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
+from keras.applications.resnet50 import ResNet50
+
 
 if keras.__version__.startswith('1'):
     from keras.utils.visualize_util import plot
@@ -155,6 +157,64 @@ def conv_3_fc_3(dropout = []):
     model.add(Activation('relu', name='act5'))
 
     # layer 6: fully connected. Input 24. Output 1.
+    model.add(Dense(1, name='out'))
+
+    return model
+
+
+def resnet_ish(dropout = []):
+
+    """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
+    Cars:
+
+    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
+
+    params = {
+        'conv1': { 'filters': 24, 'size': 5 },
+        'conv2': { 'filters': 36, 'size': 5 },
+        'conv3': { 'filters': 48, 'size': 5 },
+        'conv4': { 'filters': 64, 'size': 3 },
+        'conv5': { 'filters': 64, 'size': 3 },
+        'full6': { 'outputs': 100 },
+        'full7': { 'outputs': 50 },
+        'full8': { 'outputs': 10 },
+    }
+
+    if dropout == None or len(dropout) == 0:
+        dropout = [0.0, 0.0, 0.0]
+    elif len(dropout) == 1:
+        dropout = dropout * 3
+    elif len(dropout) == 2:
+        dropout.append(dropout[1])
+
+    model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
+
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
+
+    # resize the image for ResNet50
+    model.add(Lambda(lambda img: tf.image.resize_images(img, (224, 224))))
+
+    # mean center the pixels
+    model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
+
+    resnet = ResNet50(weights='imagenet', include_top=False)
+
+    for layer in resnet.layers:
+        layer.trainable = False
+
+    model.add(resnet)
+
+    model.add(Flatten())
+
+    model.add(Dense(1000, name='fc153'))
+    model.add(Dropout(dropout[0], name='drop153'))
+    model.add(Activation('relu', name='act153'))
+
+    model.add(Dense(100, name='fc154'))
+    model.add(Dropout(dropout[1], name='drop154'))
+    model.add(Activation('relu', name='act154'))
+
     model.add(Dense(1, name='out'))
 
     return model
