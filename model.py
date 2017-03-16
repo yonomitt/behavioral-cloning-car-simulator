@@ -328,6 +328,8 @@ def data_generator(samples, resize=None, batch_size=128):
                 image = cv2.imread(name)
                 if resize:
                     image = cv2.resize(image, resize)
+                if batch_sample[2]:
+                    image = cv2.flip(image, 1)
                 angle = batch_sample[1]
                 images.append(image)
                 angles.append(angle)
@@ -369,12 +371,27 @@ def read_samples(base_dirs):
         with open(os.path.join(base_dir, "driving_log.csv")) as f:
             log = [l.split(',') for l in f.read().split('\n')[1:-1]]
 
-            # center image
-            samples.extend([(gen_rel_img(base_dir, l[0]), float(l[3]) / 25.0) for l in log])
-            # left image
-            samples.extend([(gen_rel_img(base_dir, l[1]), (float(l[3]) + STEERING_CORRECTION) / 25.0) for l in log])
-            # right image
-            samples.extend([(gen_rel_img(base_dir, l[2]), (float(l[3]) - STEERING_CORRECTION) / 25.0) for l in log])
+            for l in log:
+                center_steering = float(l[3]) / 25.0
+                left_steering = (float(l[3]) + STEERING_CORRECTION) / 25.0
+                right_steering = (float(l[3]) - STEERING_CORRECTION) / 25.0
+
+                # center image
+                samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
+                # left image
+                samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
+                # right image
+                samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
+
+                # mirror images
+                if center_steering != 0.0:
+                    samples.append((gen_rel_img(base_dir, l[0]), -center_steering, True))
+
+                if left_steering != 0.0:
+                    samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
+
+                if right_steering != 0.0:
+                    samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
 
     return samples
 
