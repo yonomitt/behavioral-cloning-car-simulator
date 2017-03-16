@@ -410,10 +410,11 @@ if __name__ == '__main__':
     print("n_valid: {}".format(n_valid))
 
     save_best = ModelCheckpoint("{}.hdf5".format(exp_name), save_best_only=True, verbose=1)
+    stop_early = EarlyStopping(patience=4, verbose=1)
 
     history_object = model.fit_generator(train_generator, samples_per_epoch=n_train,
             validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch,
-            callbacks=[save_best])
+            callbacks=[save_best, stop_early])
 
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
