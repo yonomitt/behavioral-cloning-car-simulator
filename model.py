@@ -32,7 +32,8 @@ else:
     from keras.utils.vis_utils import plot_model as plot
 
 
-STEERING_CORRECTION = 0.2
+# steering correction in degrees
+STEERING_CORRECTION = 6
 VALIDATION_PCT = 0.2
 
 
