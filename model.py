@@ -19,7 +19,7 @@ tf.python.control_flow_ops = tf
 import keras
 
 from keras.models import Sequential
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
