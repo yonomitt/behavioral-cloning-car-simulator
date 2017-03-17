@@ -12,6 +12,10 @@ from PIL import Image
 from flask import Flask
 from io import BytesIO
 
+import tensorflow as tf
+
+tf.python.control_flow_ops = tf
+
 from keras.models import load_model
 import h5py
 from keras import __version__ as keras_version
@@ -60,13 +64,17 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
+
+        resize = (model.input_shape[2], model.input_shape[1])
+
+        image = image.resize(resize, Image.ANTIALIAS)
         image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        steering_angle = 25.0 * float(model.predict(image_array[None, :, :, :], batch_size=1))
 
         throttle = controller.update(float(speed))
 
         print(steering_angle, throttle)
-        send_control(steering_angle, throttle)
+        send_control(steering_angle, 1)
 
         # save frame
         if args.image_folder != '':
