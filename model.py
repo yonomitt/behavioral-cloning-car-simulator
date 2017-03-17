@@ -360,9 +360,9 @@ def read_samples(base_dirs):
             log = [l.split(',') for l in f.read().split('\n')[1:-1]]
 
             for l in log:
-                center_steering = float(l[3]) / 25.0
-                left_steering = (float(l[3]) + STEERING_CORRECTION) / 25.0
-                right_steering = (float(l[3]) - STEERING_CORRECTION) / 25.0
+                center_steering = float(l[3])# / 25.0
+                left_steering = (float(l[3]) + STEERING_CORRECTION)# / 25.0
+                right_steering = (float(l[3]) - STEERING_CORRECTION)# / 25.0
 
                 # center image
                 samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
