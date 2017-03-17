@@ -406,8 +406,10 @@ if __name__ == '__main__':
     train_samples = samples[:n_train]
     valid_samples = samples[n_train:]
 
-    train_generator = data_generator(train_samples, batch_size=batch_size)
-    valid_generator = data_generator(valid_samples, batch_size=batch_size)
+    resize = (model.input_shape[2], model.input_shape[1])
+
+    train_generator = data_generator(train_samples, resize=resize, batch_size=batch_size)
+    valid_generator = data_generator(valid_samples, resize=resize, batch_size=batch_size)
 
     model.compile(loss='mse', optimizer='adam')
 
