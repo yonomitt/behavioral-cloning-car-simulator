@@ -24,6 +24,7 @@ from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
 from keras.applications.resnet50 import ResNet50
+from keras.applications.vgg16 import VGG16
 
 
 if keras.__version__.startswith('1'):
@@ -212,6 +213,47 @@ def resnet_ish(dropout = []):
     model.add(Dense(100, name='fc154'))
     model.add(Dropout(dropout[1], name='drop154'))
     model.add(Activation('relu', name='act154'))
+
+    model.add(Dense(1, name='out'))
+
+    return model
+
+
+def vgg16_ish(dropout = []):
+
+    """This model attempts to use transfer learning on VGG16"""
+
+    if dropout == None or len(dropout) == 0:
+        dropout = [0.0, 0.0, 0.0]
+    elif len(dropout) == 1:
+        dropout = dropout * 3
+    elif len(dropout) == 2:
+        dropout.append(dropout[1])
+
+    model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
+
+    # crop top 157 rows and bottom 67 rows from the images
+    model.add(Cropping2D(cropping=((157, 67), (0, 0)), input_shape=(448, 224, 3), name='pp_crop'))
+
+    # mean center the pixels
+    model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
+
+    vgg16 = VGG16(weights='imagenet', include_top=False)
+
+    for layer in vgg16.layers:
+        layer.trainable = False
+
+    model.add(vgg16)
+
+    model.add(Flatten())
+
+    model.add(Dense(1000, name='fc17'))
+    model.add(Dropout(dropout[0], name='drop17'))
+    model.add(Activation('relu', name='act17'))
+
+    model.add(Dense(100, name='fc17'))
+    model.add(Dropout(dropout[1], name='drop17'))
+    model.add(Activation('relu', name='act17'))
 
     model.add(Dense(1, name='out'))
 
