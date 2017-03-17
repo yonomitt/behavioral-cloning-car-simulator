@@ -166,21 +166,7 @@ def conv_3_fc_3(dropout = []):
 
 def resnet_ish(dropout = []):
 
-    """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
-    Cars:
-
-    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
-
-    params = {
-        'conv1': { 'filters': 24, 'size': 5 },
-        'conv2': { 'filters': 36, 'size': 5 },
-        'conv3': { 'filters': 48, 'size': 5 },
-        'conv4': { 'filters': 64, 'size': 3 },
-        'conv5': { 'filters': 64, 'size': 3 },
-        'full6': { 'outputs': 100 },
-        'full7': { 'outputs': 50 },
-        'full8': { 'outputs': 10 },
-    }
+    """This model attempts to use transfer learning on ResNet50"""
 
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
