@@ -38,7 +38,7 @@ STEERING_CORRECTION = 6
 VALIDATION_PCT = 0.2
 
 
-def conv_3_fc_3_more_filters(dropout = []):
+def conv_4_fc_3_more_filters(dropout = []):
 
     """This network has three convolution layers and three fully connected layers
 
@@ -67,33 +67,38 @@ def conv_3_fc_3_more_filters(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution + max pooling. Input 40x160x3. Output 20x80x32
+    # layer 1: convolution + max pooling. Input 80x320x3. Output 40x160x32
     model.add(Convolution2D(32, 5, 5, border_mode='same', name='conv1'))
     model.add(MaxPooling2D((2, 2), name='pool1'))
     model.add(Activation('relu', name='act1'))
 
-    # layer 2: convolution = max pooling. Input 20x80x32. Output 10x40x64
-    model.add(Convolution2D(64, 3, 3, border_mode='same', name='conv2'))
+    # layer 2: convolution = max pooling. Input 40x160x32. Output 20x80x64
+    model.add(Convolution2D(64, 5, 5, border_mode='same', name='conv2'))
     model.add(MaxPooling2D((2, 2), name='pool2'))
     model.add(Activation('relu', name='act2'))
 
-    # layer 3: convolution = max pooling. Input 10x40x64. Output 5x20x128
+    # layer 3: convolution = max pooling. Input 20x80x64. Output 10x40x128
     model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv3'))
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
+
+    # layer 3: convolution = max pooling. Input 10x40x128. Output 5x20x128
+    model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv4'))
+    model.add(MaxPooling2D((2, 2), name='pool4'))
+    model.add(Activation('relu', name='act4'))
 
     # flatten: Input 5x20x128. Output 12800
     model.add(Flatten(name='flat'))
 
     # layer 4: fully connected + dropout. Input 12800. Output 556
-    model.add(Dense(556, name='fc4'))
-    model.add(Dropout(dropout[0], name='drop4'))
-    model.add(Activation('relu', name='act4'))
+    model.add(Dense(556, name='fc5'))
+    model.add(Dropout(dropout[0], name='drop5'))
+    model.add(Activation('relu', name='act5'))
 
     # layer 5: fully connected + dropout. Input 556. Output 24
-    model.add(Dense(24, name='fc5'))
-    model.add(Dropout(dropout[1], name='drop5'))
-    model.add(Activation('relu', name='act5'))
+    model.add(Dense(24, name='fc6'))
+    model.add(Dropout(dropout[1], name='drop6'))
+    model.add(Activation('relu', name='act6'))
 
     # layer 6: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
@@ -101,7 +106,7 @@ def conv_3_fc_3_more_filters(dropout = []):
     return model
 
 
-def conv_3_fc_3(dropout = []):
+def conv_4_fc_3(dropout = []):
 
     """This network has three convolution layers and three fully connected layers
 
@@ -130,33 +135,38 @@ def conv_3_fc_3(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution + max pooling. Input 40x160x3. Output 20x80x8
+    # layer 1: convolution + max pooling. Input 80x320x3. Output 40x160x8
     model.add(Convolution2D(8, 5, 5, border_mode='same', name='conv1'))
     model.add(MaxPooling2D((2, 2), name='pool1'))
     model.add(Activation('relu', name='act1'))
 
-    # layer 2: convolution = max pooling. Input 20x80x8. Output 10x40x16
-    model.add(Convolution2D(16, 3, 3, border_mode='same', name='conv2'))
+    # layer 2: convolution = max pooling. Input 40x160x8. Output 20x80x16
+    model.add(Convolution2D(16, 5, 5, border_mode='same', name='conv2'))
     model.add(MaxPooling2D((2, 2), name='pool2'))
     model.add(Activation('relu', name='act2'))
 
-    # layer 3: convolution = max pooling. Input 10x40x16. Output 5x20x32
+    # layer 3: convolution = max pooling. Input 20x80x16. Output 10x40x32
     model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv3'))
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
+
+    # layer 3: convolution = max pooling. Input 10x40x32. Output 5x20x32
+    model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv4'))
+    model.add(MaxPooling2D((2, 2), name='pool4'))
+    model.add(Activation('relu', name='act4'))
 
     # flatten: Input 5x20x32. Output 3200
     model.add(Flatten(name='flat'))
 
     # layer 4: fully connected + dropout. Input 3200. Output 556
-    model.add(Dense(556, name='fc4'))
-    model.add(Dropout(dropout[0], name='drop4'))
-    model.add(Activation('relu', name='act4'))
+    model.add(Dense(556, name='fc5'))
+    model.add(Dropout(dropout[0], name='drop5'))
+    model.add(Activation('relu', name='act5'))
 
     # layer 5: fully connected + dropout. Input 556. Output 24
-    model.add(Dense(24, name='fc5'))
-    model.add(Dropout(dropout[1], name='drop5'))
-    model.add(Activation('relu', name='act5'))
+    model.add(Dense(24, name='fc6'))
+    model.add(Dropout(dropout[1], name='drop6'))
+    model.add(Activation('relu', name='act6'))
 
     # layer 6: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
@@ -418,7 +428,7 @@ if __name__ == '__main__':
     batch_size = 32
     nb_epoch = 5
 
-    model = conv_3_fc_3(dropout=[0.2, 0.5])
+    model = conv_4_fc_3(dropout=[0.2, 0.5])
     model.summary()
 
     exp_name = "{}.b{}.e{}".format(model.name, batch_size, nb_epoch)
