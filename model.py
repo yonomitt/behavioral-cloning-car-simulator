@@ -34,7 +34,7 @@ else:
 
 
 # steering correction in degrees
-STEERING_CORRECTION = 6
+STEERING_CORRECTION = 0.1
 VALIDATION_PCT = 0.2
 
 
@@ -382,7 +382,7 @@ def gen_rel_img(base, path):
     return os.path.join(base, "IMG", os.path.split(path.strip())[-1])
 
 
-def read_samples(base_dirs):
+def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_correction=STEERING_CORRECTION):
 
     """Read the samples from CSV files
 
@@ -393,6 +393,9 @@ def read_samples(base_dirs):
 
     samples = []
 
+    def dont_ignore(steering, percent):
+        return (steering != 0.0) or (np.random.random() < (1 - percent))
+
     for base_dir in base_dirs:
 
         with open(os.path.join(base_dir, "driving_log.csv")) as f:
@@ -400,25 +403,31 @@ def read_samples(base_dirs):
 
             for l in log:
                 center_steering = float(l[3])# / 25.0
-                left_steering = (float(l[3]) + STEERING_CORRECTION)# / 25.0
-                right_steering = (float(l[3]) - STEERING_CORRECTION)# / 25.0
+                left_steering = (float(l[3]) + steering_correction)# / 25.0
+                right_steering = (float(l[3]) - steering_correction)# / 25.0
 
                 # center image
-                samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
-                # left image
-                samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
-                # right image
-                samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
+                if dont_ignore(center_steering, zeros_to_ignore):
+                    samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
+
+                if not center_only:
+                    # left image
+                    if dont_ignore(left_steering, zeros_to_ignore):
+                        samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
+                    # right image
+                    if dont_ignore(right_steering, zeros_to_ignore):
+                        samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
 
                 # mirror images
                 if center_steering != 0.0:
                     samples.append((gen_rel_img(base_dir, l[0]), -center_steering, True))
 
-                if left_steering != 0.0:
-                    samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
-
-                if right_steering != 0.0:
-                    samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
+                if not center_only:
+                    if left_steering != 0.0:
+                        samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
+    
+                    if right_steering != 0.0:
+                        samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
 
     return samples
 
