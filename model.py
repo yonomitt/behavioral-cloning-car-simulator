@@ -282,7 +282,7 @@ def end_to_end_nvidia(dropout = []):
 
     # layer 1: convolution. Input 40x160x3. Output 36x156x24
     model.add(Convolution2D(24, 5, 5, border_mode='valid', name='conv1'))
-    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool2'))
+    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool1'))
     model.add(Activation('relu', name='act1'))
 
     # layer 2: convolution + max pooling. Input 36x156x24. Output 16x76x36
