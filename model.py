@@ -24,6 +24,7 @@ from keras.layers.core import Dense, Activation, Flatten, Dropout, Lambda
 from keras.layers.convolutional import Convolution2D, Cropping2D
 from keras.layers.pooling import MaxPooling2D
 from keras.applications.resnet50 import ResNet50
+from keras.applications.vgg16 import VGG16
 
 
 if keras.__version__.startswith('1'):
@@ -33,11 +34,11 @@ else:
 
 
 # steering correction in degrees
-STEERING_CORRECTION = 6
+STEERING_CORRECTION = 0.1
 VALIDATION_PCT = 0.2
 
 
-def conv_3_fc_3_more_filters(dropout = []):
+def conv_4_fc_3_more_filters(dropout = []):
 
     """This network has three convolution layers and three fully connected layers
 
@@ -60,39 +61,44 @@ def conv_3_fc_3_more_filters(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution + max pooling. Input 40x160x3. Output 20x80x32
+    # layer 1: convolution + max pooling. Input 80x320x3. Output 40x160x32
     model.add(Convolution2D(32, 5, 5, border_mode='same', name='conv1'))
     model.add(MaxPooling2D((2, 2), name='pool1'))
     model.add(Activation('relu', name='act1'))
 
-    # layer 2: convolution = max pooling. Input 20x80x32. Output 10x40x64
-    model.add(Convolution2D(64, 3, 3, border_mode='same', name='conv2'))
+    # layer 2: convolution = max pooling. Input 40x160x32. Output 20x80x64
+    model.add(Convolution2D(64, 5, 5, border_mode='same', name='conv2'))
     model.add(MaxPooling2D((2, 2), name='pool2'))
     model.add(Activation('relu', name='act2'))
 
-    # layer 3: convolution = max pooling. Input 10x40x64. Output 5x20x128
+    # layer 3: convolution = max pooling. Input 20x80x64. Output 10x40x128
     model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv3'))
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
+
+    # layer 3: convolution = max pooling. Input 10x40x128. Output 5x20x128
+    model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv4'))
+    model.add(MaxPooling2D((2, 2), name='pool4'))
+    model.add(Activation('relu', name='act4'))
 
     # flatten: Input 5x20x128. Output 12800
     model.add(Flatten(name='flat'))
 
     # layer 4: fully connected + dropout. Input 12800. Output 556
-    model.add(Dense(556, name='fc4'))
-    model.add(Dropout(dropout[0], name='drop4'))
-    model.add(Activation('relu', name='act4'))
+    model.add(Dense(556, name='fc5'))
+    model.add(Dropout(dropout[0], name='drop5'))
+    model.add(Activation('relu', name='act5'))
 
     # layer 5: fully connected + dropout. Input 556. Output 24
-    model.add(Dense(24, name='fc5'))
-    model.add(Dropout(dropout[1], name='drop5'))
-    model.add(Activation('relu', name='act5'))
+    model.add(Dense(24, name='fc6'))
+    model.add(Dropout(dropout[1], name='drop6'))
+    model.add(Activation('relu', name='act6'))
 
     # layer 6: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
@@ -100,7 +106,7 @@ def conv_3_fc_3_more_filters(dropout = []):
     return model
 
 
-def conv_3_fc_3(dropout = []):
+def conv_4_fc_3(dropout = []):
 
     """This network has three convolution layers and three fully connected layers
 
@@ -123,39 +129,44 @@ def conv_3_fc_3(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
-    # layer 1: convolution + max pooling. Input 40x160x3. Output 20x80x8
+    # layer 1: convolution + max pooling. Input 80x320x3. Output 40x160x8
     model.add(Convolution2D(8, 5, 5, border_mode='same', name='conv1'))
     model.add(MaxPooling2D((2, 2), name='pool1'))
     model.add(Activation('relu', name='act1'))
 
-    # layer 2: convolution = max pooling. Input 20x80x8. Output 10x40x16
-    model.add(Convolution2D(16, 3, 3, border_mode='same', name='conv2'))
+    # layer 2: convolution = max pooling. Input 40x160x8. Output 20x80x16
+    model.add(Convolution2D(16, 5, 5, border_mode='same', name='conv2'))
     model.add(MaxPooling2D((2, 2), name='pool2'))
     model.add(Activation('relu', name='act2'))
 
-    # layer 3: convolution = max pooling. Input 10x40x16. Output 5x20x32
+    # layer 3: convolution = max pooling. Input 20x80x16. Output 10x40x32
     model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv3'))
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
+
+    # layer 3: convolution = max pooling. Input 10x40x32. Output 5x20x32
+    model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv4'))
+    model.add(MaxPooling2D((2, 2), name='pool4'))
+    model.add(Activation('relu', name='act4'))
 
     # flatten: Input 5x20x32. Output 3200
     model.add(Flatten(name='flat'))
 
     # layer 4: fully connected + dropout. Input 3200. Output 556
-    model.add(Dense(556, name='fc4'))
-    model.add(Dropout(dropout[0], name='drop4'))
-    model.add(Activation('relu', name='act4'))
+    model.add(Dense(556, name='fc5'))
+    model.add(Dropout(dropout[0], name='drop5'))
+    model.add(Activation('relu', name='act5'))
 
     # layer 5: fully connected + dropout. Input 556. Output 24
-    model.add(Dense(24, name='fc5'))
-    model.add(Dropout(dropout[1], name='drop5'))
-    model.add(Activation('relu', name='act5'))
+    model.add(Dense(24, name='fc6'))
+    model.add(Dropout(dropout[1], name='drop6'))
+    model.add(Activation('relu', name='act6'))
 
     # layer 6: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
@@ -165,21 +176,7 @@ def conv_3_fc_3(dropout = []):
 
 def resnet_ish(dropout = []):
 
-    """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
-    Cars:
-
-    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
-
-    params = {
-        'conv1': { 'filters': 24, 'size': 5 },
-        'conv2': { 'filters': 36, 'size': 5 },
-        'conv3': { 'filters': 48, 'size': 5 },
-        'conv4': { 'filters': 64, 'size': 3 },
-        'conv5': { 'filters': 64, 'size': 3 },
-        'full6': { 'outputs': 100 },
-        'full7': { 'outputs': 50 },
-        'full8': { 'outputs': 10 },
-    }
+    """This model attempts to use transfer learning on ResNet50"""
 
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
@@ -218,6 +215,47 @@ def resnet_ish(dropout = []):
     return model
 
 
+def vgg16_ish(dropout = []):
+
+    """This model attempts to use transfer learning on VGG16"""
+
+    if dropout == None or len(dropout) == 0:
+        dropout = [0.0, 0.0, 0.0]
+    elif len(dropout) == 1:
+        dropout = dropout * 3
+    elif len(dropout) == 2:
+        dropout.append(dropout[1])
+
+    model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
+
+    # crop top 157 rows and bottom 67 rows from the images
+    model.add(Cropping2D(cropping=((157, 67), (0, 0)), input_shape=(448, 224, 3), name='pp_crop'))
+
+    # mean center the pixels
+    model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
+
+    vgg16 = VGG16(weights='imagenet', include_top=False)
+
+    for layer in vgg16.layers:
+        layer.trainable = False
+
+    model.add(vgg16)
+
+    model.add(Flatten())
+
+    model.add(Dense(1000, name='fc17'))
+    model.add(Dropout(dropout[0], name='drop17'))
+    model.add(Activation('relu', name='act17'))
+
+    model.add(Dense(100, name='fc17'))
+    model.add(Dropout(dropout[1], name='drop17'))
+    model.add(Activation('relu', name='act17'))
+
+    model.add(Dense(1, name='out'))
+
+    return model
+
+
 def end_to_end_nvidia(dropout = []):
 
     """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
@@ -246,14 +284,15 @@ def end_to_end_nvidia(dropout = []):
     # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
-    # crop top 28 rows and bottom 12 rows from the images
-    model.add(Cropping2D(cropping=((28, 12), (0, 0)), input_shape=(80, 160, 3), name='pp_crop'))
+    # crop top 56 rows and bottom 24 rows from the images
+    model.add(Cropping2D(cropping=((56, 24), (0, 0)), input_shape=(160, 320, 3), name='pp_crop'))
 
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
     # layer 1: convolution. Input 40x160x3. Output 36x156x24
     model.add(Convolution2D(24, 5, 5, border_mode='valid', name='conv1'))
+    model.add(MaxPooling2D((2, 2), border_mode='valid', name='pool1'))
     model.add(Activation('relu', name='act1'))
 
     # layer 2: convolution + max pooling. Input 36x156x24. Output 16x76x36
@@ -343,7 +382,7 @@ def gen_rel_img(base, path):
     return os.path.join(base, "IMG", os.path.split(path.strip())[-1])
 
 
-def read_samples(base_dirs):
+def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_correction=STEERING_CORRECTION):
 
     """Read the samples from CSV files
 
@@ -354,32 +393,41 @@ def read_samples(base_dirs):
 
     samples = []
 
+    def dont_ignore(steering, percent):
+        return (steering != 0.0) or (np.random.random() < (1 - percent))
+
     for base_dir in base_dirs:
 
         with open(os.path.join(base_dir, "driving_log.csv")) as f:
             log = [l.split(',') for l in f.read().split('\n')[1:-1]]
 
             for l in log:
-                center_steering = float(l[3]) / 25.0
-                left_steering = (float(l[3]) + STEERING_CORRECTION) / 25.0
-                right_steering = (float(l[3]) - STEERING_CORRECTION) / 25.0
+                center_steering = float(l[3])# / 25.0
+                left_steering = (float(l[3]) + steering_correction)# / 25.0
+                right_steering = (float(l[3]) - steering_correction)# / 25.0
 
                 # center image
-                samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
-                # left image
-                samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
-                # right image
-                samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
+                if dont_ignore(center_steering, zeros_to_ignore):
+                    samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
+
+                if not center_only:
+                    # left image
+                    if dont_ignore(left_steering, zeros_to_ignore):
+                        samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
+                    # right image
+                    if dont_ignore(right_steering, zeros_to_ignore):
+                        samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
 
                 # mirror images
                 if center_steering != 0.0:
                     samples.append((gen_rel_img(base_dir, l[0]), -center_steering, True))
 
-                if left_steering != 0.0:
-                    samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
-
-                if right_steering != 0.0:
-                    samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
+                if not center_only:
+                    if left_steering != 0.0:
+                        samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
+    
+                    if right_steering != 0.0:
+                        samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
 
     return samples
 
@@ -389,7 +437,7 @@ if __name__ == '__main__':
     batch_size = 32
     nb_epoch = 5
 
-    model = conv_3_fc_3(dropout=[0.2, 0.5])
+    model = conv_4_fc_3(dropout=[0.2, 0.5])
     model.summary()
 
     exp_name = "{}.b{}.e{}".format(model.name, batch_size, nb_epoch)
