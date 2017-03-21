@@ -410,24 +410,24 @@ def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_cor
                 if dont_ignore(center_steering, zeros_to_ignore):
                     samples.append((gen_rel_img(base_dir, l[0]), center_steering, False))
 
-                if not center_only:
-                    # left image
-                    if dont_ignore(left_steering, zeros_to_ignore):
-                        samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
-                    # right image
-                    if dont_ignore(right_steering, zeros_to_ignore):
-                        samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
+                    if not center_only:
+                        # left image
+                        if dont_ignore(left_steering, zeros_to_ignore):
+                            samples.append((gen_rel_img(base_dir, l[1]), left_steering, False))
+                        # right image
+                        if dont_ignore(right_steering, zeros_to_ignore):
+                            samples.append((gen_rel_img(base_dir, l[2]), right_steering, False))
 
-                # mirror images
-                if center_steering != 0.0:
-                    samples.append((gen_rel_img(base_dir, l[0]), -center_steering, True))
+                    # mirror images
+                    if center_steering != 0.0:
+                        samples.append((gen_rel_img(base_dir, l[0]), -center_steering, True))
 
-                if not center_only:
-                    if left_steering != 0.0:
-                        samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
-    
-                    if right_steering != 0.0:
-                        samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
+                    if not center_only:
+                        if left_steering != 0.0:
+                            samples.append((gen_rel_img(base_dir, l[1]), -left_steering, True))
+        
+                        if right_steering != 0.0:
+                            samples.append((gen_rel_img(base_dir, l[2]), -right_steering, True))
 
     return samples
 
