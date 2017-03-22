@@ -45,14 +45,6 @@ def conv_4_fc_3_more_filters(dropout = []):
     Parameters:
         dropout - list of dropout values for the 3 fully connected layers"""
 
-    params = {
-        'conv1': { 'filters': 8,  'size': 5 },
-        'conv2': { 'filters': 16, 'size': 3 },
-        'conv3': { 'filters': 32, 'size': 3 },
-        'full4': { 'outputs': 556 },
-        'full5': { 'outputs': 24 },
-    }
-
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
     elif len(dropout) == 1:
@@ -112,14 +104,6 @@ def conv_4_fc_3(dropout = []):
 
     Parameters:
         dropout - list of dropout values for the 3 fully connected layers"""
-
-    params = {
-        'conv1': { 'filters': 8,  'size': 5 },
-        'conv2': { 'filters': 16, 'size': 3 },
-        'conv3': { 'filters': 32, 'size': 3 },
-        'full4': { 'outputs': 556 },
-        'full5': { 'outputs': 24 },
-    }
 
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
@@ -262,17 +246,6 @@ def end_to_end_nvidia(dropout = []):
     Cars:
 
     https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
-
-    params = {
-        'conv1': { 'filters': 24, 'size': 5 },
-        'conv2': { 'filters': 36, 'size': 5 },
-        'conv3': { 'filters': 48, 'size': 5 },
-        'conv4': { 'filters': 64, 'size': 3 },
-        'conv5': { 'filters': 64, 'size': 3 },
-        'full6': { 'outputs': 100 },
-        'full7': { 'outputs': 50 },
-        'full8': { 'outputs': 10 },
-    }
 
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
