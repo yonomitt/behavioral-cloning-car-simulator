@@ -364,7 +364,15 @@ def end_to_end_nvidia(dropout = []):
     
 def data_generator(samples, resize=None, batch_size=128):
 
-    """A generator method to provide the model with data during training"""
+    """A generator method to provide the model with data during training
+    
+    Parameters:
+        samples    - list of all samples to be used as inputs
+        resize     - new image size to resize inputs to, if desired
+        batch_size - batch size to generate
+
+    Yields:
+        A shuffled batch of input samples and labels in groups of batch_size"""
 
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
@@ -377,10 +385,15 @@ def data_generator(samples, resize=None, batch_size=128):
             for batch_sample in batch_samples:
                 name = batch_sample[0]
                 image = cv2.imread(name)
+
+                # resize the image if needed
                 if resize:
                     image = cv2.resize(image, resize)
+
+                # flip the image as determined by this boolean
                 if batch_sample[2]:
                     image = cv2.flip(image, 1)
+
                 angle = batch_sample[1]
                 images.append(image)
                 angles.append(angle)
@@ -411,12 +424,17 @@ def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_cor
     """Read the samples from CSV files
 
     Parameters:
-        - base_dirs: list of directories containing the CSV files
+        - base_dirs:           list of directories containing the CSV files
+        - centers_only:        only use center camera images
+        - zeros_to_ignore:     percentage of samples with a steering angle of 0.0 to toss out
+        - steering_correction: steering correction for the left camera
         
-    Returns: list of tuples containing the absolute path to the image and the normalized steering angle"""
+    Returns: 
+        list of tuples containing the absolute path to the image, the steering angle, and whether the image should be flipped"""
 
     samples = []
 
+    # helper function to help determine if an input sample should be ignored
     def dont_ignore(steering, percent):
         return (steering != 0.0) or (np.random.random() < (1 - percent))
 
@@ -458,19 +476,26 @@ def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_cor
 
 if __name__ == '__main__':
 
+    # hyper parameters
     batch_size = 32
     nb_epoch = 5
 
+    # select a model
     model = conv_4_fc_3(dropout=[0.2, 0.5])
+
+    # print out a summary of the model's layers
     model.summary()
 
+    # generate a base name for the output files
     exp_name = "{}.b{}.e{}".format(model.name, batch_size, nb_epoch)
 
+    # plot the model layers
     plot(model, show_shapes=True, to_file='results/model_{}.png'.format(exp_name))
 
     # get data
     samples = read_samples(['data/udacity'])
 
+    # split data into training and validation sets
     n_samples = len(samples)
     n_valid = round(n_samples * VALIDATION_PCT)
     n_train = n_samples - n_valid
@@ -478,17 +503,22 @@ if __name__ == '__main__':
     train_samples = samples[:n_train]
     valid_samples = samples[n_train:]
 
+    # calculate if images need to be resized based on the model input shape
     resize = (model.input_shape[2], model.input_shape[1])
 
+    # create input generators for the model to save on memory
     train_generator = data_generator(train_samples, resize=resize, batch_size=batch_size)
     valid_generator = data_generator(valid_samples, resize=resize, batch_size=batch_size)
 
+    # compile the model
     model.compile(loss='mse', optimizer='adam')
 
     print("n_samples: {}".format(n_samples))
     print("n_train: {}".format(n_train))
     print("n_valid: {}".format(n_valid))
 
+    # add callbacks to save the model each time the validation loss improved
+    # and to stop early if nothing has changed in 5 epochs
     save_best = ModelCheckpoint("{}.hdf5".format(exp_name), save_best_only=True, verbose=1)
     stop_early = EarlyStopping(patience=4, verbose=1)
 
@@ -496,6 +526,7 @@ if __name__ == '__main__':
             validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch,
             callbacks=[save_best, stop_early])
 
+    # save a plot of the validation loss and training loss over epochs
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
     plt.title('model mean squared error loss')
