@@ -40,11 +40,17 @@ VALIDATION_PCT = 0.2
 
 def conv_4_fc_3_more_filters(dropout = []):
 
-    """This network has three convolution layers and three fully connected layers
+    """This network has four convolution layers and three fully connected layers and a lot more
+    filters than the conv_4_fc_3 model.
 
     Parameters:
-        dropout - list of dropout values for the 3 fully connected layers"""
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model"""
 
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
     elif len(dropout) == 1:
@@ -100,11 +106,16 @@ def conv_4_fc_3_more_filters(dropout = []):
 
 def conv_4_fc_3(dropout = []):
 
-    """This network has three convolution layers and three fully connected layers
+    """This network has four convolution layers and three fully connected layers
 
     Parameters:
-        dropout - list of dropout values for the 3 fully connected layers"""
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model"""
 
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
     elif len(dropout) == 1:
@@ -160,8 +171,16 @@ def conv_4_fc_3(dropout = []):
 
 def resnet_ish(dropout = []):
 
-    """This model attempts to use transfer learning on ResNet50"""
+    """This model attempts to use transfer learning on ResNet50
 
+    Parameters:
+        dropout - list of dropout values for the 2 fully connected layers
+        
+    Returns:
+        A model with ResNet50 at it's core"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
@@ -169,6 +188,7 @@ def resnet_ish(dropout = []):
     elif len(dropout) == 2:
         dropout.append(dropout[1])
 
+    # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
     # crop top 157 rows and bottom 67 rows from the images
@@ -177,23 +197,30 @@ def resnet_ish(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
+    # load the ResNet50 model with weights from imagenet. Do not include the top of the model
+    # as it will be replaced and trained for driving in the simulator.
     resnet = ResNet50(weights='imagenet', include_top=False)
 
+    # freeze the ResNet50 layers to speed up training
     for layer in resnet.layers:
         layer.trainable = False
 
     model.add(resnet)
 
+    # flatten
     model.add(Flatten())
 
+    # layer 153. fully connected + dropout. Input 2048. Output 1000.
     model.add(Dense(1000, name='fc153'))
     model.add(Dropout(dropout[0], name='drop153'))
     model.add(Activation('relu', name='act153'))
 
+    # layer 154. fully connected + dropout. Input 1000. Output 100.
     model.add(Dense(100, name='fc154'))
     model.add(Dropout(dropout[1], name='drop154'))
     model.add(Activation('relu', name='act154'))
 
+    # layer 155: fully connected. Input 100. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -201,8 +228,16 @@ def resnet_ish(dropout = []):
 
 def vgg16_ish(dropout = []):
 
-    """This model attempts to use transfer learning on VGG16"""
+    """This model attempts to use transfer learning on VGG16
 
+    Parameters:
+        dropout - list of dropout values for the 2 fully connected layers
+        
+    Returns:
+        A model with VGG16 at it's core"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
@@ -210,6 +245,7 @@ def vgg16_ish(dropout = []):
     elif len(dropout) == 2:
         dropout.append(dropout[1])
 
+    # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
     # crop top 157 rows and bottom 67 rows from the images
@@ -218,23 +254,30 @@ def vgg16_ish(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
+    # load the VGG16 model with weights from imagenet. Do not include the top of the model
+    # as it will be replaced and trained for driving in the simulator.
     vgg16 = VGG16(weights='imagenet', include_top=False)
 
+    # freeze the ResNet50 layers to speed up training
     for layer in vgg16.layers:
         layer.trainable = False
 
     model.add(vgg16)
 
+    # flatten
     model.add(Flatten())
 
+    # layer 17. fully connected + dropout. Input 25088. Output 1000.
     model.add(Dense(1000, name='fc17'))
     model.add(Dropout(dropout[0], name='drop17'))
     model.add(Activation('relu', name='act17'))
 
-    model.add(Dense(100, name='fc17'))
-    model.add(Dropout(dropout[1], name='drop17'))
-    model.add(Activation('relu', name='act17'))
+    # layer 18. fully connected + dropout. Input 1000. Output 100.
+    model.add(Dense(100, name='fc18'))
+    model.add(Dropout(dropout[1], name='drop18'))
+    model.add(Activation('relu', name='act18'))
 
+    # layer 19: fully connected. Input 100. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -245,8 +288,16 @@ def end_to_end_nvidia(dropout = []):
     """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
     Cars:
 
-    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
+    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf
 
+    Parameters:
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model based on the End to End NVIDIA model"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
