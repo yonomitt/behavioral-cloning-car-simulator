@@ -37,10 +37,13 @@ if __name__ == '__main__':
         print("Model '{}' NOT FOUND".format(args.model))
         sys.exit(-1)
 
+    # the identifier is an extra string added to the base output file name to help me add more info to the file names
     identifier = args.identifier
 
+    # get the appropriate model generating function based on the input
     gen_model = globals()[args.model]
 
+    # read hyper parameters
     batch_size = args.batch_size
     nb_epoch = args.epochs
     valid_pct = args.valid_pct
@@ -48,12 +51,16 @@ if __name__ == '__main__':
     zeros_to_ignore = args.zeros_to_ignore
     center_only = args.center_only
 
-
+    # read a list of dropout percentages
     dropout = args.dropout
 
+    # generate the model
     model = gen_model(dropout=dropout)
+
+    # print out a summary of the model layers
     model.summary()
     
+    # generate the base file name incorporating the model name and the important hyper parameters
     exp_parts = []
 
     if identifier:
@@ -74,12 +81,14 @@ if __name__ == '__main__':
 
     exp_name = '-'.join(exp_parts)
 
+    # save a plot of the model layers
     plot(model, show_shapes=True, to_file='results/{}-model.png'.format(exp_name))
 
     # get data
     sample_sets = args.sample_sets or glob.glob('data/*')
     samples = read_samples(sample_sets, center_only=center_only, zeros_to_ignore=zeros_to_ignore, steering_correction=steering_correction)
 
+    # split data into training and validation sets
     nb_samples = len(samples)
     nb_valid = round(nb_samples * valid_pct)
     nb_train = nb_samples - nb_valid
@@ -87,17 +96,22 @@ if __name__ == '__main__':
     train_samples = samples[:nb_train]
     valid_samples = samples[nb_train:]
 
+    # calculate if images need to be resized based on the model input shape
     resize = (model.input_shape[2], model.input_shape[1])
 
+    # create input generators for the model to save on memory
     train_generator = data_generator(train_samples, resize=resize, batch_size=batch_size)
     valid_generator = data_generator(valid_samples, resize=resize, batch_size=batch_size)
 
+    # compile the model
     model.compile(loss='mse', optimizer='adam')
 
     print("nb_samples: {}".format(nb_samples))
     print("nb_train: {}".format(nb_train))
     print("nb_valid: {}".format(nb_valid))
 
+    # add callbacks to save the model each time the validation loss improved
+    # and to stop early if nothing has changed in 5 epochs
     save_best = ModelCheckpoint("results/{}.hdf5".format(exp_name), save_best_only=True, verbose=1)
     stop_early = EarlyStopping(patience=4, verbose=1)
 
@@ -105,6 +119,7 @@ if __name__ == '__main__':
             validation_data=valid_generator, nb_val_samples=nb_valid, nb_epoch=nb_epoch,
             callbacks=[save_best, stop_early])
 
+    # save a plot of the validation loss and training loss over epochs
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
     plt.title('model mean squared error loss')
