@@ -19,7 +19,7 @@ class ArgParser(argparse.ArgumentParser):
 if __name__ == '__main__':
 
     parser = ArgParser(description='Trains a model to drive a car simulator by example', add_help=False)
-    dummy = parser.add_argument('-m', '--model', type=str, help='Name of the model to run', default='conv_3_fc_3')
+    dummy = parser.add_argument('-m', '--model', type=str, help='Name of the model to run', default='conv_4_fc_3')
     dummy = parser.add_argument('-e', '--epochs', type=int, help='Number of epochs to train', default=5)
     dummy = parser.add_argument('-b', '--batch_size', type=int, help='Number of samples in a batch', default=32)
     dummy = parser.add_argument('-d', '--dropout', type=float, nargs='+', help='Dropout rates for the layers', default=[0.0])
