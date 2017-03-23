@@ -80,7 +80,7 @@ def conv_4_fc_3_more_filters(dropout = []):
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
 
-    # layer 3: convolution = max pooling. Input 10x40x128. Output 5x20x128
+    # layer 4: convolution = max pooling. Input 10x40x128. Output 5x20x128
     model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv4'))
     model.add(MaxPooling2D((2, 2), name='pool4'))
     model.add(Activation('relu', name='act4'))
@@ -88,17 +88,17 @@ def conv_4_fc_3_more_filters(dropout = []):
     # flatten: Input 5x20x128. Output 12800
     model.add(Flatten(name='flat'))
 
-    # layer 4: fully connected + dropout. Input 12800. Output 556
+    # layer 5: fully connected + dropout. Input 12800. Output 556
     model.add(Dense(556, name='fc5'))
     model.add(Dropout(dropout[0], name='drop5'))
     model.add(Activation('relu', name='act5'))
 
-    # layer 5: fully connected + dropout. Input 556. Output 24
+    # layer 6: fully connected + dropout. Input 556. Output 24
     model.add(Dense(24, name='fc6'))
     model.add(Dropout(dropout[1], name='drop6'))
     model.add(Activation('relu', name='act6'))
 
-    # layer 6: fully connected. Input 24. Output 1.
+    # layer 7: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -145,7 +145,7 @@ def conv_4_fc_3(dropout = []):
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
 
-    # layer 3: convolution = max pooling. Input 10x40x32. Output 5x20x32
+    # layer 4: convolution = max pooling. Input 10x40x32. Output 5x20x32
     model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv4'))
     model.add(MaxPooling2D((2, 2), name='pool4'))
     model.add(Activation('relu', name='act4'))
@@ -153,17 +153,17 @@ def conv_4_fc_3(dropout = []):
     # flatten: Input 5x20x32. Output 3200
     model.add(Flatten(name='flat'))
 
-    # layer 4: fully connected + dropout. Input 3200. Output 556
+    # layer 5: fully connected + dropout. Input 3200. Output 556
     model.add(Dense(556, name='fc5'))
     model.add(Dropout(dropout[0], name='drop5'))
     model.add(Activation('relu', name='act5'))
 
-    # layer 5: fully connected + dropout. Input 556. Output 24
+    # layer 6: fully connected + dropout. Input 556. Output 24
     model.add(Dense(24, name='fc6'))
     model.add(Dropout(dropout[1], name='drop6'))
     model.add(Activation('relu', name='act6'))
 
-    # layer 6: fully connected. Input 24. Output 1.
+    # layer 7: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
