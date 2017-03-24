@@ -100,7 +100,7 @@ The hyper parameters of my final model are:
 - epochs: **30** (although early stopping and model checkpoints were implemented)
 - dropout: **0.63** for the first and second fully connected layers
 
-The model used an adam optimizer, so the learning rate was not tuned manually ([project3.py, line 107](./project3.py#L107)).
+The model used an Adam optimizer, so the learning rate was not tuned manually ([project3.py, line 107](./project3.py#L107)).
 
 #### 4. Appropriate training data
 
@@ -118,8 +118,8 @@ The models I tried out include:
 
 - **[conv_4_fc_3](./model.py#L107L169)**: My eventual best model comprising of 4 convolution layers and 3 fully connected layers.
 - **[conv_4_fc_3_more_filters](./model.py#L41L104)**: A modification of *conv_4_fc_3* that added significantly more filters to the convolution layers
-- **[resnet_ish](./model.py#L172L226)**: An attempt to try transfer learning by using a ResNet50 model pretrained on ImageNet with new fully connected layers attached to the end of the convolution layer stack
-- **[vgg16_ish](./model.py#L229L283)**: Another attempt to try transfer learning by using a VGG16 model pretrained on ImageNet
+- **[resnet_ish](./model.py#L172L226)**: An attempt to try transfer learning by using a ResNet50 model pre-trained on ImageNet with new fully connected layers attached to the end of the convolution layer stack
+- **[vgg16_ish](./model.py#L229L283)**: Another attempt to try transfer learning by using a VGG16 model pre-trained on ImageNet
 - **[end_to_end_nvidia](./model.py#L286L362)**
 
 My experimenting cycle:
@@ -135,15 +135,15 @@ My experimenting cycle:
 
 Relatively quickly, I had to rule out further experiments with **resnet_ish** and **vgg16_ish**. The problem I had was that my laptop was too slow to run the models fast enough for the simulator. Instead of trying to figure out if I could run the simulator on the p2.xlarge spot instance, I decided to discard those models in the interest of time.
 
-My winning[^winning] mode was **conv_4_fc_3**, ironically, the first model I created. I started with the final model from my [Traffic Sign Recognizer Project](https://github.com/yonomitt/traffic-sign-classifier) and modified it. I added a convolution layer tweaked the number of filters slightly.
+My winning model was **conv_4_fc_3**, ironically, the first model I created. I started with the final model from my [Traffic Sign Recognizer Project](https://github.com/yonomitt/traffic-sign-classifier) and modified it. I added a convolution layer tweaked the number of filters slightly.
 
 I created **conv_4_fc_3_more_filters** because I was interested in seeing the effect of vastly increasing the number of filters of each convolution layer on the final results. Quite to my surprise, it performed worse, though this could have something to do with the size of the fully connected layers at the end.
 
-I also knew from the beginning that I wanted to try out the End to End NVIDIA model as outlined in [this paper](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). As I had to tweak it slighty due to different input sizes, I think I probably made some inoptimal decisions. The result of the model was rather disappointing, so I'm sure I made some mistakes along the way. However, since I was running out of time and another model was working, I didn't investigate this further.
+I also knew from the beginning that I wanted to try out the End to End NVIDIA model as outlined in [this paper](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). As I had to tweak it slightly due to different input sizes, I think I probably made some non-optimal decisions. The result of the model was rather disappointing, so I'm sure I made some mistakes along the way. However, since I was running out of time and another model was working, I didn't investigate this further.
 
 #### Early Stopping
 
-I used Keras's early stopping callback to stop training the model if the validation loss did not improve in the last 4 epochs. This is intended to help prevent overfitting.
+I used Keras' early stopping callback to stop training the model if the validation loss did not improve in the last 4 epochs. This is intended to help prevent overfitting.
 
 #### Model Checkpoint
 
@@ -157,20 +157,20 @@ An interesting correlation I seemed to notice between dropout and the autonomous
 
 After all of my experiments, I was able to get 4 models to drive all the way around the track without leaving the road. From best to worst:
 
-1. **conv_4_fc_3** - winner
+1. **[conv_4_fc_3](./video.mp4)** - winner
 	- dropout: 0.63 for both fully connected layers
 	- steering correction: 0.1
 	- zeros angle inputs ignored: 80%
-2. **conv_4_fc_3** - left the lane once but not the road
+2. **[conv_4_fc_3](./videos/20170321.01-conv_4_fc_3-b32-e30-d0.50_0.50-s0.1-v0.2-z0.8-agressively-cut-input.mp4)** - left the lane once but not the road
 	- also cut left and right camera inputs if the center steering angle was 0.0
 	- dropout: 0.5 for both fully connected layers
 	- steering correction: 0.1
 	- zeros angle inputs ignored: 80%
-3. **conv_4_fc_3** - left the lane twice but not the road
+3. **[conv_4_fc_3](./videos/20170319.02-conv_4_fc_3-b32-e30-d0.50_0.50-s0.1-v0.2-z0.8.mp4)** - left the lane twice but not the road
 	- dropout: 0.5 for both fully connected layers
 	- steering correction: 0.1
 	- zeros angle inputs ignored: 80%
-4. **conv_4_fc_3_more_filters** - drunk driving
+4. **[conv_4_fc_3_more_filters](./videos/20170320.01-conv_4_fc_3_more_filters-b32-e30-d0.37_0.37-s0.1-v0.2-z0.8.mp4)** - drunk driving
 	- dropout: 0.37 for both fully connected layers
 	- steering correction: 0.1
 	- zeros angle inputs ignored: 80%
@@ -231,3 +231,5 @@ Because I didn't want my model to be focused on when not to turn, I implemented 
 In the end, the model was trained on 102,816 samples and validated using 25,704 samples.
 
 I played a lot with hyper parameters for my models, hence the creation of the [project3.py] wrapper script and the [train_the_ocean.sh] shell script. In the end, I ran over 100 experiments to arrive at my final model.
+
+I would have loved to continue experimenting and I could have done so for a long, long time. I had many more ideas I wanted to try out, but at some point you have to ship it.
