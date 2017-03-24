@@ -76,25 +76,17 @@ The file shows the pipeline I used for training and validating the model, and it
 
 #### 1. An appropriate model architecture has been employed
 
-My *winning*[^winning] model, called conv_4_fc_3[^line107-169], consists of 4 convolution layers followed by 3 fully connected layers. 
+My *winning* model, called [conv_4_fc_3](./model.py#L107L169), consists of 4 convolution layers followed by 3 fully connected layers. By **winning** I mean the best model among the models I tried.
 
-[^winning]: By **winning** I mean the best model among the models I tried.
-[^line107-169]: [model.py, lines 107 - 169](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L107L169)
-[^lines133-151]: [model.py, lines 133 - 151](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L133L151)
-[^line128]: [model.py, line 128](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L128)
-[^line131]: [model.py, line 131](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L131)
+The first two convolution layers use a 5x5 filter size and have depths of 8 and 16. The last two convolution layers use a 3x3 filter size and have depths of 32 ([model.py, lines 133 - 151][./model.py#L133L151]).
 
-The first two convolution layers use a 5x5 filter size and have depths of 8 and 16. The last two convolution layers use a 3x3 filter size and have depths of 32.[^lines133-151]
-
-Prior to the first convolution layer, the model includes a Keras cropping layer to take off the top 56 and bottom 24 rows of pixels off the input.[^line128] It then mean centers the pixels using a Keras lambda layer.[^line131]
+Prior to the first convolution layer, the model includes a Keras cropping layer to take off the top 56 and bottom 24 rows of pixels off the input ([model.py, line 128](./model.py#L128)). It then mean centers the pixels using a Keras lambda layer ([model.py, line 131](./model.py#L131)).
 
 The model uses RELU activation layers to introduce nonlinearity.
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers for the first two fully connected layers in order to reduce overfitting.[^lines158and163] It does not make sense to use dropout on the final fully connected layer, as then the model will just output a zero during passes when dropout is in effect.
-
-[^lines158and163]: [model.py, line 158](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L158) and [model.py, line 163](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L163)
+The model contains dropout layers for the first two fully connected layers in order to reduce overfitting ([model.py, line 158](./model.py#L158) and [model.py, line 163](./model.py#L163)). It does not make sense to use dropout on the final fully connected layer, as then the model will just output a zero during passes when dropout is in effect.
 
 The model was trained and validated on several different data sets to ensure that the model was not overfitting. This is not hard coded into the file, but rather passed as a command line argument (-s) to the [project.py] wrapper script.
 
@@ -108,9 +100,7 @@ The hyper parameters of my final model are:
 - epochs: **30** (although early stopping and model checkpoints were implemented)
 - dropout: **0.63** for the first and second fully connected layers
 
-The model used an adam optimizer, so the learning rate was not tuned manually.[^project3_line107]
-
-[^project3_line107]: [project3.py, line 107](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py#L107)
+The model used an adam optimizer, so the learning rate was not tuned manually ([project3.py, line 107](./project3.py#L107)).
 
 #### 4. Appropriate training data
 
@@ -126,11 +116,11 @@ I **really** like to experiment. I tend to experiment a lot, especially in subje
 
 The models I tried out include:
 
-- **[conv_4_fc_3](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L107L169)**: My eventual best model comprising of 4 convolution layers and 3 fully connected layers.
-- **[conv_4_fc_3_more_filters](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L41L104)**: A modification of *conv_4_fc_3* that added significantly more filters to the convolution layers
-- **[resnet_ish](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L172L226)**: An attempt to try transfer learning by using a ResNet50 model pretrained on ImageNet with new fully connected layers attached to the end of the convolution layer stack
-- **[vgg16_ish](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L229L283)**: Another attempt to try transfer learning by using a VGG16 model pretrained on ImageNet
-- **[end_to_end_nvidia](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py#L286L362)**
+- **[conv_4_fc_3](./model.py#L107L169)**: My eventual best model comprising of 4 convolution layers and 3 fully connected layers.
+- **[conv_4_fc_3_more_filters](./model.py#L41L104)**: A modification of *conv_4_fc_3* that added significantly more filters to the convolution layers
+- **[resnet_ish](./model.py#L172L226)**: An attempt to try transfer learning by using a ResNet50 model pretrained on ImageNet with new fully connected layers attached to the end of the convolution layer stack
+- **[vgg16_ish](./model.py#L229L283)**: Another attempt to try transfer learning by using a VGG16 model pretrained on ImageNet
+- **[end_to_end_nvidia](./model.py#L286L362)**
 
 My experimenting cycle:
 
