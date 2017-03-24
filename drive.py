@@ -65,6 +65,7 @@ def telemetry(sid, data):
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
 
+        # resize the input of the model input shape requires
         resize = (model.input_shape[2], model.input_shape[1])
 
         if image.size != resize:
@@ -73,6 +74,7 @@ def telemetry(sid, data):
         image_array = np.asarray(image)
         steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 
+        # set throttle to a constant
         throttle = 0.2
 
         print(steering_angle, throttle)

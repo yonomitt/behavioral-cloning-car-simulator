@@ -40,19 +40,17 @@ VALIDATION_PCT = 0.2
 
 def conv_4_fc_3_more_filters(dropout = []):
 
-    """This network has three convolution layers and three fully connected layers
+    """This network has four convolution layers and three fully connected layers and a lot more
+    filters than the conv_4_fc_3 model.
 
     Parameters:
-        dropout - list of dropout values for the 3 fully connected layers"""
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model"""
 
-    params = {
-        'conv1': { 'filters': 8,  'size': 5 },
-        'conv2': { 'filters': 16, 'size': 3 },
-        'conv3': { 'filters': 32, 'size': 3 },
-        'full4': { 'outputs': 556 },
-        'full5': { 'outputs': 24 },
-    }
-
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
     elif len(dropout) == 1:
@@ -82,7 +80,7 @@ def conv_4_fc_3_more_filters(dropout = []):
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
 
-    # layer 3: convolution = max pooling. Input 10x40x128. Output 5x20x128
+    # layer 4: convolution = max pooling. Input 10x40x128. Output 5x20x128
     model.add(Convolution2D(128, 3, 3, border_mode='same', name='conv4'))
     model.add(MaxPooling2D((2, 2), name='pool4'))
     model.add(Activation('relu', name='act4'))
@@ -90,17 +88,17 @@ def conv_4_fc_3_more_filters(dropout = []):
     # flatten: Input 5x20x128. Output 12800
     model.add(Flatten(name='flat'))
 
-    # layer 4: fully connected + dropout. Input 12800. Output 556
+    # layer 5: fully connected + dropout. Input 12800. Output 556
     model.add(Dense(556, name='fc5'))
     model.add(Dropout(dropout[0], name='drop5'))
     model.add(Activation('relu', name='act5'))
 
-    # layer 5: fully connected + dropout. Input 556. Output 24
+    # layer 6: fully connected + dropout. Input 556. Output 24
     model.add(Dense(24, name='fc6'))
     model.add(Dropout(dropout[1], name='drop6'))
     model.add(Activation('relu', name='act6'))
 
-    # layer 6: fully connected. Input 24. Output 1.
+    # layer 7: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -108,19 +106,16 @@ def conv_4_fc_3_more_filters(dropout = []):
 
 def conv_4_fc_3(dropout = []):
 
-    """This network has three convolution layers and three fully connected layers
+    """This network has four convolution layers and three fully connected layers
 
     Parameters:
-        dropout - list of dropout values for the 3 fully connected layers"""
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model"""
 
-    params = {
-        'conv1': { 'filters': 8,  'size': 5 },
-        'conv2': { 'filters': 16, 'size': 3 },
-        'conv3': { 'filters': 32, 'size': 3 },
-        'full4': { 'outputs': 556 },
-        'full5': { 'outputs': 24 },
-    }
-
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0]
     elif len(dropout) == 1:
@@ -150,7 +145,7 @@ def conv_4_fc_3(dropout = []):
     model.add(MaxPooling2D((2, 2), name='pool3'))
     model.add(Activation('relu', name='act3'))
 
-    # layer 3: convolution = max pooling. Input 10x40x32. Output 5x20x32
+    # layer 4: convolution = max pooling. Input 10x40x32. Output 5x20x32
     model.add(Convolution2D(32, 3, 3, border_mode='same', name='conv4'))
     model.add(MaxPooling2D((2, 2), name='pool4'))
     model.add(Activation('relu', name='act4'))
@@ -158,17 +153,17 @@ def conv_4_fc_3(dropout = []):
     # flatten: Input 5x20x32. Output 3200
     model.add(Flatten(name='flat'))
 
-    # layer 4: fully connected + dropout. Input 3200. Output 556
+    # layer 5: fully connected + dropout. Input 3200. Output 556
     model.add(Dense(556, name='fc5'))
     model.add(Dropout(dropout[0], name='drop5'))
     model.add(Activation('relu', name='act5'))
 
-    # layer 5: fully connected + dropout. Input 556. Output 24
+    # layer 6: fully connected + dropout. Input 556. Output 24
     model.add(Dense(24, name='fc6'))
     model.add(Dropout(dropout[1], name='drop6'))
     model.add(Activation('relu', name='act6'))
 
-    # layer 6: fully connected. Input 24. Output 1.
+    # layer 7: fully connected. Input 24. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -176,8 +171,16 @@ def conv_4_fc_3(dropout = []):
 
 def resnet_ish(dropout = []):
 
-    """This model attempts to use transfer learning on ResNet50"""
+    """This model attempts to use transfer learning on ResNet50
 
+    Parameters:
+        dropout - list of dropout values for the 2 fully connected layers
+        
+    Returns:
+        A model with ResNet50 at it's core"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
@@ -185,6 +188,7 @@ def resnet_ish(dropout = []):
     elif len(dropout) == 2:
         dropout.append(dropout[1])
 
+    # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
     # crop top 157 rows and bottom 67 rows from the images
@@ -193,23 +197,30 @@ def resnet_ish(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
+    # load the ResNet50 model with weights from imagenet. Do not include the top of the model
+    # as it will be replaced and trained for driving in the simulator.
     resnet = ResNet50(weights='imagenet', include_top=False)
 
+    # freeze the ResNet50 layers to speed up training
     for layer in resnet.layers:
         layer.trainable = False
 
     model.add(resnet)
 
+    # flatten
     model.add(Flatten())
 
+    # layer 153. fully connected + dropout. Input 2048. Output 1000.
     model.add(Dense(1000, name='fc153'))
     model.add(Dropout(dropout[0], name='drop153'))
     model.add(Activation('relu', name='act153'))
 
+    # layer 154. fully connected + dropout. Input 1000. Output 100.
     model.add(Dense(100, name='fc154'))
     model.add(Dropout(dropout[1], name='drop154'))
     model.add(Activation('relu', name='act154'))
 
+    # layer 155: fully connected. Input 100. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -217,8 +228,16 @@ def resnet_ish(dropout = []):
 
 def vgg16_ish(dropout = []):
 
-    """This model attempts to use transfer learning on VGG16"""
+    """This model attempts to use transfer learning on VGG16
 
+    Parameters:
+        dropout - list of dropout values for the 2 fully connected layers
+        
+    Returns:
+        A model with VGG16 at it's core"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
@@ -226,6 +245,7 @@ def vgg16_ish(dropout = []):
     elif len(dropout) == 2:
         dropout.append(dropout[1])
 
+    # this hack gets the current function name and sets it to the name of the model
     model = Sequential(name=traceback.extract_stack(None, 2)[-1][2])
 
     # crop top 157 rows and bottom 67 rows from the images
@@ -234,23 +254,30 @@ def vgg16_ish(dropout = []):
     # mean center the pixels
     model.add(Lambda(lambda x: (x / 255.0) - 0.5, name='pp_center'))
 
+    # load the VGG16 model with weights from imagenet. Do not include the top of the model
+    # as it will be replaced and trained for driving in the simulator.
     vgg16 = VGG16(weights='imagenet', include_top=False)
 
+    # freeze the ResNet50 layers to speed up training
     for layer in vgg16.layers:
         layer.trainable = False
 
     model.add(vgg16)
 
+    # flatten
     model.add(Flatten())
 
+    # layer 17. fully connected + dropout. Input 25088. Output 1000.
     model.add(Dense(1000, name='fc17'))
     model.add(Dropout(dropout[0], name='drop17'))
     model.add(Activation('relu', name='act17'))
 
-    model.add(Dense(100, name='fc17'))
-    model.add(Dropout(dropout[1], name='drop17'))
-    model.add(Activation('relu', name='act17'))
+    # layer 18. fully connected + dropout. Input 1000. Output 100.
+    model.add(Dense(100, name='fc18'))
+    model.add(Dropout(dropout[1], name='drop18'))
+    model.add(Activation('relu', name='act18'))
 
+    # layer 19: fully connected. Input 100. Output 1.
     model.add(Dense(1, name='out'))
 
     return model
@@ -261,19 +288,16 @@ def end_to_end_nvidia(dropout = []):
     """This model attempts to mimic the model by NVIDIA in their paper End to End Learning for Self-Driving
     Cars:
 
-    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"""
+    https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf
 
-    params = {
-        'conv1': { 'filters': 24, 'size': 5 },
-        'conv2': { 'filters': 36, 'size': 5 },
-        'conv3': { 'filters': 48, 'size': 5 },
-        'conv4': { 'filters': 64, 'size': 3 },
-        'conv5': { 'filters': 64, 'size': 3 },
-        'full6': { 'outputs': 100 },
-        'full7': { 'outputs': 50 },
-        'full8': { 'outputs': 10 },
-    }
-
+    Parameters:
+        dropout - list of dropout values for the 3 fully connected layers
+        
+    Returns:
+        A model based on the End to End NVIDIA model"""
+        
+    # ensure the dropout list has enough values in it for the model
+    # augment the values of some are missing
     if dropout == None or len(dropout) == 0:
         dropout = [0.0, 0.0, 0.0]
     elif len(dropout) == 1:
@@ -340,7 +364,15 @@ def end_to_end_nvidia(dropout = []):
     
 def data_generator(samples, resize=None, batch_size=128):
 
-    """A generator method to provide the model with data during training"""
+    """A generator method to provide the model with data during training
+    
+    Parameters:
+        samples    - list of all samples to be used as inputs
+        resize     - new image size to resize inputs to, if desired
+        batch_size - batch size to generate
+
+    Yields:
+        A shuffled batch of input samples and labels in groups of batch_size"""
 
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
@@ -353,10 +385,15 @@ def data_generator(samples, resize=None, batch_size=128):
             for batch_sample in batch_samples:
                 name = batch_sample[0]
                 image = cv2.imread(name)
+
+                # resize the image if needed
                 if resize:
                     image = cv2.resize(image, resize)
+
+                # flip the image as determined by this boolean
                 if batch_sample[2]:
                     image = cv2.flip(image, 1)
+
                 angle = batch_sample[1]
                 images.append(image)
                 angles.append(angle)
@@ -387,12 +424,17 @@ def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_cor
     """Read the samples from CSV files
 
     Parameters:
-        - base_dirs: list of directories containing the CSV files
+        - base_dirs:           list of directories containing the CSV files
+        - centers_only:        only use center camera images
+        - zeros_to_ignore:     percentage of samples with a steering angle of 0.0 to toss out
+        - steering_correction: steering correction for the left camera
         
-    Returns: list of tuples containing the absolute path to the image and the normalized steering angle"""
+    Returns: 
+        list of tuples containing the absolute path to the image, the steering angle, and whether the image should be flipped"""
 
     samples = []
 
+    # helper function to help determine if an input sample should be ignored
     def dont_ignore(steering, percent):
         return (steering != 0.0) or (np.random.random() < (1 - percent))
 
@@ -434,19 +476,26 @@ def read_samples(base_dirs, center_only=False, zeros_to_ignore=0.0, steering_cor
 
 if __name__ == '__main__':
 
+    # hyper parameters
     batch_size = 32
     nb_epoch = 5
 
+    # select a model
     model = conv_4_fc_3(dropout=[0.2, 0.5])
+
+    # print out a summary of the model's layers
     model.summary()
 
+    # generate a base name for the output files
     exp_name = "{}.b{}.e{}".format(model.name, batch_size, nb_epoch)
 
+    # plot the model layers
     plot(model, show_shapes=True, to_file='results/model_{}.png'.format(exp_name))
 
     # get data
     samples = read_samples(['data/udacity'])
 
+    # split data into training and validation sets
     n_samples = len(samples)
     n_valid = round(n_samples * VALIDATION_PCT)
     n_train = n_samples - n_valid
@@ -454,17 +503,22 @@ if __name__ == '__main__':
     train_samples = samples[:n_train]
     valid_samples = samples[n_train:]
 
+    # calculate if images need to be resized based on the model input shape
     resize = (model.input_shape[2], model.input_shape[1])
 
+    # create input generators for the model to save on memory
     train_generator = data_generator(train_samples, resize=resize, batch_size=batch_size)
     valid_generator = data_generator(valid_samples, resize=resize, batch_size=batch_size)
 
+    # compile the model
     model.compile(loss='mse', optimizer='adam')
 
     print("n_samples: {}".format(n_samples))
     print("n_train: {}".format(n_train))
     print("n_valid: {}".format(n_valid))
 
+    # add callbacks to save the model each time the validation loss improved
+    # and to stop early if nothing has changed in 5 epochs
     save_best = ModelCheckpoint("{}.hdf5".format(exp_name), save_best_only=True, verbose=1)
     stop_early = EarlyStopping(patience=4, verbose=1)
 
@@ -472,6 +526,7 @@ if __name__ == '__main__':
             validation_data=valid_generator, nb_val_samples=n_valid, nb_epoch=nb_epoch,
             callbacks=[save_best, stop_early])
 
+    # save a plot of the validation loss and training loss over epochs
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
     plt.title('model mean squared error loss')
