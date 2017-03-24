@@ -18,9 +18,9 @@
 [project3.py]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py "wrapper script for model.py"
 [train_the_ocean.sh]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py "shell script to run many, many experiments"
 
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following standard files:
 
@@ -32,11 +32,11 @@ My project includes the following standard files:
 
 Additionally, specific to this project, I have the following important files:
 
-- **[project3.py]** - a wrapper script that takes hyperparameters as input and trains a model
+- **[project3.py]** - a wrapper script that takes hyper parameters as input and trains a model
 - **[train_the_ocean.sh]** - an example bash script used to run many experiments
 - **videos/*** - all videos of the successful models
 
-####2. Submission includes functional code
+#### 2. Submission includes functional code
 
 My [project3.py] wrapper script can be run with default parameters:
 ```sh
@@ -64,7 +64,7 @@ Using the Udacity provided simulator and my [drive.py] file, the car can be driv
 python drive.py model.h5
 ```
 
-####3. Submission code is usable and readable
+#### 3. Submission code is usable and readable
 
 The [model.py] file contains functions for reading in the sample data and creating 5 different network architectures. Additionally, it has example code for training and saving the trained models, but in practice, this is generally done in the [project3.py] wrapper script to facilitate experimentation. 
 
@@ -72,9 +72,9 @@ This contains multiple networks, because I like to experiment with different arc
 
 The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model architecture has been employed
+#### 1. An appropriate model architecture has been employed
 
 My *winning*[^winning] model, called conv_4_fc_3[^line107-169], consists of 4 convolution layers followed by 3 fully connected layers. 
 
@@ -90,7 +90,7 @@ Prior to the first convolution layer, the model includes a Keras cropping layer 
 
 The model uses RELU activation layers to introduce nonlinearity.
 
-####2. Attempts to reduce overfitting in the model
+#### 2. Attempts to reduce overfitting in the model
 
 The model contains dropout layers for the first two fully connected layers in order to reduce overfitting.[^lines158and163] It does not make sense to use dropout on the final fully connected layer, as then the model will just output a zero during passes when dropout is in effect.
 
@@ -100,7 +100,7 @@ The model was trained and validated on several different data sets to ensure tha
 
 The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-####3. Model parameter tuning
+#### 3. Model parameter tuning
 
 The hyper parameters of my final model are:
 
@@ -112,15 +112,15 @@ The model used an adam optimizer, so the learning rate was not tuned manually.[^
 
 [^project3_line107]: [project3.py, line 107](https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py#L107)
 
-####4. Appropriate training data
+#### 4. Appropriate training data
 
 Training data was chosen to keep the vehicle driving on the road. I used a lot of training samples (upwards of 130,000) from multiple runs around the track in both directions. This gave the model a large variety of inputs to learn from. These training samples incorporated the center, left, and right camera angles from the recorded laps.
 
 For details about how I created the training data, see the next section. 
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. Solution Design Approach
+#### 1. Solution Design Approach
 
 I **really** like to experiment. I tend to experiment a lot, especially in subjects that interest me. In arriving at my solution, I played with 5 different model architectures and ran over 100 experiments across them.
 
@@ -187,7 +187,7 @@ After all of my experiments, I was able to get 4 models to drive all the way aro
 
 As you can see all the models that completed the track are fairly similar with usually just a difference in the dropout rate.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The final model architecture consisted of:
 
@@ -213,7 +213,7 @@ Here is a visualization of the architecture:
 
 ![alt text][model1]
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 Since I started this project about 10 days too late, I decided to crowd source my data gathering. I messaged 12 friends and sent them links to the simulator and explained to them how to record the data. I received recorded runs from 4 of them. These combined with my own runs and the Udacity sample data, I had plenty of training data to work with.
 
@@ -241,7 +241,3 @@ Because I didn't want my model to be focused on when not to turn, I implemented 
 In the end, the model was trained on 102,816 samples and validated using 25,704 samples.
 
 I played a lot with hyper parameters for my models, hence the creation of the [project3.py] wrapper script and the [train_the_ocean.sh] shell script. In the end, I ran over 100 experiments to arrive at my final model.
-
-#### Video
-
-![alt text][video]
