@@ -9,14 +9,14 @@
 [right_image]: ./images/right.jpg "Right image"
 [normal_image]: ./images/center.jpg "Normal image"
 [flipped_image]: ./images/flipped.jpg "Flipped image"
-[video]: ./video.mp4 "Winner"
 
 [//]: # (Link References)
 
-[model.py]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/model.py "model defining file"
-[drive.py]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/drive.py "simulator driving file"
-[project3.py]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py "wrapper script for model.py"
-[train_the_ocean.sh]: https://github.com/yonomitt/behavioral-cloning-car-simulator/blob/master/project3.py "shell script to run many, many experiments"
+[model.py]: ./model.py "model defining file"
+[drive.py]: ./drive.py "simulator driving file"
+[project3.py]: ./project3.py "wrapper script for model.py"
+[train_the_ocean.sh]: ./train_the_ocean.sh "shell script to run many, many experiments"
+[video.mp4]: ./video.mp4 "video of the model driving around track one"
 
 ### Files Submitted & Code Quality
 
@@ -28,7 +28,7 @@ My project includes the following standard files:
 - **[drive.py]** - drives the car in autonomous mode
 - **model.h5** - contains a trained convolution neural network 
 - **writeup_report.md** - this file summarizing the results
-- **video.mp4** - a video of my best model driving the car autonomously
+- **[video.mp4]** - a video of my best model driving the car autonomously
 
 Additionally, specific to this project, I have the following important files:
 
