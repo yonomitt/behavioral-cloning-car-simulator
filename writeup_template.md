@@ -34,7 +34,7 @@ Additionally, specific to this project, I have the following important files:
 
 - **[project3.py]** - a wrapper script that takes hyper parameters as input and trains a model
 - **[train_the_ocean.sh]** - an example bash script used to run many experiments
-- **videos/*** - all videos of the successful models
+- **[videos/*](./videos/)** - all videos of the successful models
 
 #### 2. Submission includes functional code
 
