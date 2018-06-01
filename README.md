@@ -31,7 +31,6 @@ My project includes the following standard files:
 - **[model.py]** - contains the script to create and train the model
 - **[drive.py]** - drives the car in autonomous mode
 - **model.h5** - contains a trained convolution neural network 
-- **writeup_report.md** - this file summarizing the results
 - **[video.mp4]** - a video of my best model driving the car autonomously
 
 Additionally, specific to this project, I have the following important files:
