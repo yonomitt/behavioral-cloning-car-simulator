@@ -1,4 +1,8 @@
 
+## Overview
+
+The goal of this deep learning project is to clone driving behavior. The input data consits of screenshots from the POV of a car in a simulation and the steering angle. The model uses a convolutional neural network to learn how to steer and stay on the simulated road based on camera input.
+
 [//]: # (Image References)
 
 [model1]: ./images/20170320.01-conv_4_fc_3-b32-e30-d0.63_0.63-s0.1-v0.2-z0.8-model.png "Winning Model Visualization"
