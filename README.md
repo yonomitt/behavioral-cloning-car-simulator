@@ -22,7 +22,7 @@ The goal of this deep learning project is to clone driving behavior. The input d
 [train_the_ocean.sh]: ./train_the_ocean.sh "shell script to run many, many experiments"
 [video.mp4]: ./video.mp4 "video of the model driving around track one"
 
-### Files Submitted & Code Quality
+## Files Submitted & Code Quality
 
 #### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
@@ -75,7 +75,7 @@ This contains multiple networks, because I like to experiment with different arc
 
 The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-### Model Architecture and Training Strategy
+## Model Architecture and Training Strategy
 
 #### 1. An appropriate model architecture has been employed
 
@@ -111,7 +111,7 @@ Training data was chosen to keep the vehicle driving on the road. I used a lot o
 
 For details about how I created the training data, see the next section. 
 
-### Model Architecture and Training Strategy
+## Model Architecture and Training Strategy
 
 #### 1. Solution Design Approach
 
